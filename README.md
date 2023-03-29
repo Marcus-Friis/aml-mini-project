@@ -9,3 +9,4 @@
 * Sejt GAN shit
   * Pokemon (https://www.kaggle.com/datasets/kvpratama/pokemon-images-dataset)
   * Artists (https://www.kaggle.com/datasets/ikarus777/best-artworks-of-all-time, https://www.kaggle.com/c/gan-getting-started/data)
+  * Drawings (https://github.com/googlecreativelab/quickdraw-dataset)
