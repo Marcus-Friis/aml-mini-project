@@ -1,5 +1,8 @@
 # aml-mini-project
 
+# WE DO DRAWINGS
+
+
 ## Project ideas:
 * Distracted car drivers (https://www.kaggle.com/competitions/state-farm-distracted-driver-detection/data)
 * Tagging music sequence
