@@ -9,10 +9,11 @@ from tqdm import tqdm
 import mlflow
 
 from IPython.display import HTML
+import matplotlib as mpl
 import matplotlib.animation as animation
+from matplotlib.animation import writers
 
-
-def generate_grid(generator, noise=None, latent_dim=100, n=10, device='cpu', show=True):
+def generate_grid(generator, noise=None, latent_dim=100, n=10, device='cpu', show=False):
     if noise is None:
         noise = torch.randn(n*n, latent_dim).to(device)
     else:
@@ -32,7 +33,9 @@ def generate_grid(generator, noise=None, latent_dim=100, n=10, device='cpu', sho
     return fig, ax
 
 
-def training_animation(img_list, interval=1000, repeat_delay=1000, show=True):
+def training_animation(img_list, interval=1000, repeat_delay=1000, show=False, save=False):
+    mpl.rcParams['animation.ffmpeg_path'] = r'D:\ffmpeg\bin\ffmpeg.exe'
+    
     fig = plt.figure(figsize=(8,8))
     plt.axis("off")
     ims = [[plt.imshow(np.transpose(i,(1,2,0)), animated=True)] for i in img_list]
@@ -41,10 +44,15 @@ def training_animation(img_list, interval=1000, repeat_delay=1000, show=True):
     if show:
         HTML(ani.to_jshtml())
         
+    if save:
+        Writer = writers['ffmpeg']
+        writer = Writer(fps=5)
+        ani.save('training.gif', writer)
+        
     return fig, ani
 
 
-def plot_gan_loss(G_losses, D_losses, show=True):
+def plot_gan_loss(G_losses, D_losses, show=False):
     fig, ax = plt.subplots(figsize=(10,5))
     ax.set_title("Generator and Discriminator Loss During Training")
     ax.plot(G_losses,label="G")
@@ -55,3 +63,16 @@ def plot_gan_loss(G_losses, D_losses, show=True):
     if show:
         plt.show()
     return fig, ax
+
+def calc_convtranspose2d_output_dim(H_in, stride, padding_in, dilation, kernel_size, padding_out):
+    return (H_in - 1) * stride - 2 * padding_in + dilation * (kernel_size - 1) + padding_out + 1
+
+
+if __name__ == '__main__':
+    H_in = 3
+    stride = 2
+    padding_in = 0
+    dilation = 0
+    kernel_size = 3
+    padding_out = 0
+    print(calc_convtranspose2d_output_dim(H_in, stride, padding_in, dilation, kernel_size, padding_out))
