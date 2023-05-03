@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import datasets, transforms
+from torch.utils.data import TensorDataset, DataLoader
 import torchvision.utils as vutils
-from torchsummary import summary
 import numpy as np
 import matplotlib.pyplot as plt
 import mlflow
@@ -19,8 +19,19 @@ import matplotlib.animation as animation
 def get_mnist():
     trainset = datasets.MNIST('data', download=True, train=True, transform=transform)
     valset = datasets.MNIST('data', download=True, train=False, transform=transform)
-    return trainset, valset
+    return trainset  #, valset
 
+
+def get_cats():
+    img_dim = 28
+    cats = np.load('data/cats/full_numpy_bitmap_cat.npy').reshape(-1, 1, img_dim, img_dim) / 255
+    n_cats = cats.shape[0]
+
+    x = cats  
+    y = np.ones(n_cats)
+
+    trainset = TensorDataset(torch.tensor(x).float(), torch.tensor(y).float())
+    return trainset
 
 if __name__ == '__main__':
     # run parameters
@@ -42,9 +53,9 @@ if __name__ == '__main__':
     # setup data
     batch_size = 64
 
-    trainset, valset = get_mnist()
+    trainset = get_cats()
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
-    valloader = torch.utils.data.DataLoader(valset, batch_size=batch_size, shuffle=True)
+    # valloader = torch.utils.data.DataLoader(valset, batch_size=batch_size, shuffle=True)
     
     # define model hyperparameters
     latent_dim = 100
@@ -80,75 +91,78 @@ if __name__ == '__main__':
     D_batch_losses = []
     iters = 0
     
-    for epoch in range(1, n_epochs + 1):
-        for i, (real, _) in enumerate(trainloader):
-            ## train the discriminator on real data
-            # make the discriminator predict on the real data
-            real = real.to(device)
-            b_size = real.size(0)
-            label = torch.full((b_size,), real_label, dtype=torch.float, device=device)
-            output = discriminator(real).view(-1)
-            
-            # calculate the loss
-            d_loss_real = loss_fn(output, label)
-            
-            ## train the discriminator on fake data
-            # generate fake data
-            noise = torch.randn(b_size, latent_dim, device=device)
-            fake = generator(noise)
-            label = torch.full((b_size,), fake_label, dtype=torch.float, device=device)
-            
-            # make the discriminator predict on the fake data
-            output = discriminator(fake.detach()).view(-1)
-            
-            # calculate the loss
-            d_loss_fake = loss_fn(output, label)
-    
-            # compute full loss and backpropagate       
-            d_loss = d_loss_real + d_loss_fake
-            d_optim.zero_grad()
-            d_loss.backward()
-            d_optim.step()
-            
-            
-            ## train the generator
-            label = torch.full((b_size,), real_label, dtype=torch.float, device=device)
-            
-            # make the discriminator predict on the fake data
-            output = discriminator(fake).view(-1)
-            
-            # calculate the loss for the generator
-            g_loss = loss_fn(output, label)
-            
-            # backpropagate
-            g_optim.zero_grad()
-            g_loss.backward()
-            g_optim.step()
-            
-            # Save Losses for plotting later
-            G_losses.append(g_loss.item())
-            D_losses.append(d_loss.item())
+    try:
+        for epoch in range(1, n_epochs + 1):
+            for i, (real, _) in enumerate(trainloader):
+                ## train the discriminator on real data
+                # make the discriminator predict on the real data
+                real = real.to(device)
+                b_size = real.size(0)
+                label = torch.full((b_size,), real_label, dtype=torch.float, device=device)
+                output = discriminator(real).view(-1)
                 
-            # print training progress
-            if verbose and i % 50 == 0:
-                print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f'
-                    % (epoch, n_epochs, i, len(trainloader),
-                        d_loss.item(), g_loss.item()))
+                # calculate the loss
+                d_loss_real = loss_fn(output, label)
                 
-            # Check how the generator is doing by saving G's output on fixed_noise
-            if (iters % 500 == 0) or ((epoch == n_epochs-1) and (i == len(trainloader)-1)):
-                with torch.no_grad():
-                    fake = generator(fixed_noise).detach().cpu()
-                img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
-            
-            # increment iteration counter
-            iters += 1
-            
-        # save batch losses
-        G_batch_losses.append(np.mean(G_losses[-b_size:]))
-        D_batch_losses.append(np.mean(D_losses[-b_size:]))
+                ## train the discriminator on fake data
+                # generate fake data
+                noise = torch.randn(b_size, latent_dim, device=device)
+                fake = generator(noise)
+                label = torch.full((b_size,), fake_label, dtype=torch.float, device=device)
+                
+                # make the discriminator predict on the fake data
+                output = discriminator(fake.detach()).view(-1)
+                
+                # calculate the loss
+                d_loss_fake = loss_fn(output, label)
         
-    
+                # compute full loss and backpropagate       
+                d_loss = d_loss_real + d_loss_fake
+                d_optim.zero_grad()
+                d_loss.backward()
+                d_optim.step()
+                
+                
+                ## train the generator
+                label = torch.full((b_size,), real_label, dtype=torch.float, device=device)
+                
+                # make the discriminator predict on the fake data
+                output = discriminator(fake).view(-1)
+                
+                # calculate the loss for the generator
+                g_loss = loss_fn(output, label)
+                
+                # backpropagate
+                g_optim.zero_grad()
+                g_loss.backward()
+                g_optim.step()
+                
+                # Save Losses for plotting later
+                G_losses.append(g_loss.item())
+                D_losses.append(d_loss.item())
+                    
+                # print training progress
+                if verbose and i % 50 == 0:
+                    print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f'
+                        % (epoch, n_epochs, i, len(trainloader),
+                            d_loss.item(), g_loss.item()))
+                    
+                # Check how the generator is doing by saving G's output on fixed_noise
+                if (iters % 500 == 0) or ((epoch == n_epochs-1) and (i == len(trainloader)-1)):
+                    with torch.no_grad():
+                        fake = generator(fixed_noise).detach().cpu()
+                    img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
+                
+                # increment iteration counter
+                iters += 1
+                
+            # save batch losses
+            G_batch_losses.append(np.mean(G_losses[-b_size:]))
+            D_batch_losses.append(np.mean(D_losses[-b_size:]))
+    except KeyboardInterrupt:
+        print('Interrupted training')
+
+    print('logging to mlflow...')
     if mlflow_log:
         
         run_description = f'trained on MNIST for {n_epochs} epochs with batch size {batch_size}, models:\n{generator.__repr__()} \n{discriminator.__repr__()}'
@@ -158,12 +172,12 @@ if __name__ == '__main__':
             # log parameters
             params = {
                 # training parameters
-                'n_epochs': n_epochs,
+                'n_epochs': epoch,
                 'lr': lr,
                 'latent_dim': latent_dim,
                 'batch_size': batch_size,
-                'optimizer': 'Adam',
-                'loss_fn': 'BCELoss',
+                'optimizer': d_optim.__repr__(),
+                'loss_fn': loss_fn.__repr__(),
                 
                 # model parameters
                 'latent_dim': latent_dim,
@@ -200,4 +214,4 @@ if __name__ == '__main__':
             # gif test
             mlflow.log_artifact('kitty-cat-sandwich.gif')
             fig, ani = training_animation(img_list, save=True)
-            mlflow.log_artifact('training.gif')
+            mlflow.log_artifact('training.mp4')

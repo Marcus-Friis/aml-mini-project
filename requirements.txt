@@ -1,0 +1,16 @@
+pip==22.0.4
+numpy==1.21.6
+scipy>=1.7.3
+
+jupyter==1.0.0
+pandas==1.3.5
+matplotlib==3.2.2
+matplotlib_inline==0.1.6
+seaborn==0.11.2
+scikit-learn==1.0.2
+
+torch==1.13
+torchvision==0.14
+
+wandb==0.15.0
+tqdm

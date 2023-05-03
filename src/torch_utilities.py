@@ -34,8 +34,6 @@ def generate_grid(generator, noise=None, latent_dim=100, n=10, device='cpu', sho
 
 
 def training_animation(img_list, interval=1000, repeat_delay=1000, show=False, save=False):
-    mpl.rcParams['animation.ffmpeg_path'] = r'D:\ffmpeg\bin\ffmpeg.exe'
-    
     fig = plt.figure(figsize=(8,8))
     plt.axis("off")
     ims = [[plt.imshow(np.transpose(i,(1,2,0)), animated=True)] for i in img_list]
@@ -47,7 +45,7 @@ def training_animation(img_list, interval=1000, repeat_delay=1000, show=False, s
     if save:
         Writer = writers['ffmpeg']
         writer = Writer(fps=5)
-        ani.save('training.gif', writer)
+        ani.save('training.mp4', writer)
         
     return fig, ani
 
