@@ -45,7 +45,7 @@ def training_animation(img_list, interval=1000, repeat_delay=1000, show=False, s
     if save:
         Writer = writers['ffmpeg']
         writer = Writer(fps=5)
-        ani.save('training.mp4', writer)
+        ani.save('training.gif', writer)
         
     return fig, ani
 
