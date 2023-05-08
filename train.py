@@ -21,7 +21,6 @@ warnings.filterwarnings('ignore')
 
 def get_mnist():
     trainset = datasets.MNIST('data', download=True, train=True, transform=transform)
-    valset = datasets.MNIST('data', download=True, train=False, transform=transform)
     return trainset  #, valset
 
 
@@ -71,7 +70,6 @@ if __name__ == '__main__':
     # setup data
     trainset = get_cats()
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
-    # valloader = torch.utils.data.DataLoader(valset, batch_size=batch_size, shuffle=True)
     
     # generate fixed noise for visualization of training progress
     fixed_noise = torch.randn(64, latent_dim, 1, 1, device=device)  # torch.randn(64, latent_dim, device=device)
@@ -201,6 +199,10 @@ if __name__ == '__main__':
             
             # log loss curves
             fig, ax = plot_gan_loss(G_batch_losses, D_batch_losses, show=False)
+            mlflow.log_figure(fig, 'gan_loss_batch.svg')
+            plt.close(fig)
+
+            fig, ax = plot_gan_loss(G_losses, D_losses, show=False)
             mlflow.log_figure(fig, 'gan_loss.svg')
             plt.close(fig)
             
