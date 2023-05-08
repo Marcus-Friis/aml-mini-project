@@ -52,7 +52,7 @@ if __name__ == '__main__':
     latent_dim = 100
     dropout = 0.2
     ## setup training hyperparameters
-    lr = 1e-4
+    lr = 0.0002
     n_epochs = 40
     weight_decay = 1e-3
 
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         ])
 
     # setup data
-    trainset = get_mnist()
+    trainset = get_cats()
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
     # valloader = torch.utils.data.DataLoader(valset, batch_size=batch_size, shuffle=True)
     

@@ -165,6 +165,7 @@ class SuperDeepConvDiscriminator(nn.Module):
 
         self.main = nn.Sequential(
             nn.Conv2d(1, ndf, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf),
             nn.LeakyReLU(0.2, inplace=True),
             nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 2),
