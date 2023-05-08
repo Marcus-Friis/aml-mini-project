@@ -37,6 +37,23 @@ if __name__ == '__main__':
     # run parameters
     verbose = True
     mlflow_log = True
+
+    # setup device
+    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+    device = torch.device(device)
+
+    # hyperparameters
+    batch_size = 64
+    ## define model hyperparameters
+    latent_dim = 100
+    dropout = 0.3
+    ## setup training hyperparameters
+    lr = 1e-3
+    n_epochs = 50
+
+    # instantiate model
+    generator = DeepGenerator(latent_dim=latent_dim, dropout=dropout).to(device)
+    discriminator = ConvDiscriminator().to(device)
     
     # setup mlflow tracking
     mlflow.set_tracking_uri('http://localhost:5000')
@@ -46,24 +63,10 @@ if __name__ == '__main__':
         transforms.ToTensor(),
         ])
 
-    # setup device
-    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-    device = torch.device(device)
-
     # setup data
-    batch_size = 64
-
     trainset = get_cats()
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
     # valloader = torch.utils.data.DataLoader(valset, batch_size=batch_size, shuffle=True)
-    
-    # define model hyperparameters
-    latent_dim = 100
-    dropout = 0.3
-    
-    # instantiate model
-    generator = DeepGenerator(latent_dim=latent_dim, dropout=dropout).to(device)
-    discriminator = ConvDiscriminator().to(device)
     
     # generate fixed noise for visualization of training progress
     fixed_noise = torch.randn(64, latent_dim, device=device)
@@ -71,10 +74,6 @@ if __name__ == '__main__':
     # setup real and fake labels for loss function
     real_label = 1.
     fake_label = 0.
-    
-    # setup training hyperparameters
-    lr = 1e-3
-    n_epochs = 50
 
     # setup loss function
     loss_fn = nn.BCELoss()
