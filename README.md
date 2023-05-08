@@ -1,5 +1,7 @@
 Members: Mads Høgenhaug, Marcus Friis, Morten Pedersen
 
+<img src="figs/mnist_train_example.gif" width="800">
+
 Central Problem: Generating synthetic drawings, based on data from Google Quickdraw. 
 
 Domain: Generative Models
