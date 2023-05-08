@@ -47,13 +47,13 @@ if __name__ == '__main__':
     print('using device: ', device)
 
     # hyperparameters
-    batch_size = 64
+    batch_size = 128
     ## define model hyperparameters
-    latent_dim = 100
-    dropout = 0.3
+    latent_dim = 400
+    dropout = 0.2
     ## setup training hyperparameters
-    lr = 1e-3
-    n_epochs = 50
+    lr = 1e-4
+    n_epochs = 40
 
     # instantiate model
     generator = DeepGenerator(latent_dim=latent_dim, dropout=dropout).to(device)
