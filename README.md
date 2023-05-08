@@ -1,4 +1,5 @@
-Members: Mads Høgenhaug, Marcus Friis, Morten Pedersen
+# Generating synthetic drawings with Google QuickDraw	
+### Members: Mads Høgenhaug, Marcus Friis, Morten Pedersen
 
 <img src="figs/mnist_train_example.gif" width="400">
 
