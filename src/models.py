@@ -1,6 +1,74 @@
 import torch
 import torch.nn as nn
 
+class SuperDeepGenerator(nn.Module):
+    def __init__(self,
+                latent_dim: int = 100,
+                dropout: float = 0.2,
+                ngf: int = 64
+                ):
+        super().__init__()
+
+        self.latent_dim = latent_dim
+        self.dropout = dropout
+        self.ngf = ngf
+
+        self.main = nn.Sequential(
+            nn.ConvTranspose2d(latent_dim, ngf * 4, 4, 1, 0, bias=False),
+            nn.BatchNorm2d(ngf * 4),
+            nn.ReLU(True),
+            nn.Dropout(dropout),
+            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf * 2),
+            nn.ReLU(True),
+            nn.Dropout(dropout),
+            nn.ConvTranspose2d( ngf * 2, ngf, 4, 2, 2, bias=False),
+            nn.BatchNorm2d(ngf),
+            nn.ReLU(True),
+            nn.Dropout(dropout),
+            nn.ConvTranspose2d(ngf, 1, 4, 2, 1, bias=False),
+            nn.Sigmoid()
+        )
+
+    def forward(self, input):
+        return self.main(input)
+
+
+class SuperDeepConvDiscriminator(nn.Module):
+    def __init__(self,
+                 ndf: int = 64):
+        super(SuperDeepConvDiscriminator, self).__init__()
+
+        self.ndf = ndf
+
+        self.main = nn.Sequential(
+            nn.Conv2d(1, ndf, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf * 2),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf * 4),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(ndf * 4, ndf*8, 3, 1, 0, bias=False),
+            nn.BatchNorm2d(ndf * 8),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Flatten(),
+            nn.Linear(ndf*8, 100),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(100, 1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, input):
+        return self.main(input)
+
+
+##########################################
+# Models beneath this line are not used. #
+##########################################
+
 
 class Generator(nn.Module):
     def __init__(self,
@@ -74,49 +142,6 @@ class DeepGenerator(nn.Module):
         
     def forward(self, x):
         return self.sequence(x)    
-    
-
-class SuperDeepGenerator(nn.Module):
-    def __init__(self,
-                latent_dim: int = 100,
-                dropout: float = 0.2,
-                ngf: int = 64
-                ):
-        super().__init__()
-
-        self.latent_dim = latent_dim
-        self.dropout = dropout
-        self.ngf = ngf
-
-        self.main = nn.Sequential(
-            # input is Z, going into a convolution
-            # in, out, kernel, stride, padding
-            nn.ConvTranspose2d(latent_dim, ngf * 4, 4, 1, 0, bias=False),
-            nn.BatchNorm2d(ngf * 4),
-            nn.ReLU(True),
-            nn.Dropout(dropout),
-            # state size. ``(ngf*8) x 4 x 4``
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf * 2),
-            nn.ReLU(True),
-            nn.Dropout(dropout),
-            # state size. ``(ngf*4) x 8 x 8``
-            nn.ConvTranspose2d( ngf * 2, ngf, 4, 2, 2, bias=False),
-            nn.BatchNorm2d(ngf),
-            nn.ReLU(True),
-            nn.Dropout(dropout),
-            # state size. ``(ngf*2) x 14 x 14``
-            nn.ConvTranspose2d(ngf, 1, 4, 2, 1, bias=False),
-            # nn.BatchNorm2d(ngf),
-            # nn.ReLU(True),
-            # state size. ``(ngf) x 28 x 28``
-            # nn.ConvTranspose2d( ngf, 1, 4, 2, 1, bias=False),
-            nn.Sigmoid()
-            # state size. ``(nc) x 64 x 64``
-        )
-
-    def forward(self, input):
-        return self.main(input)
 
     
 class Discriminator(nn.Module):
@@ -154,37 +179,7 @@ class ConvDiscriminator(nn.Module):
         
     def forward(self, x):
         return self.sequence(x)
-    
 
-class SuperDeepConvDiscriminator(nn.Module):
-    def __init__(self,
-                 ndf: int = 64):
-        super(SuperDeepConvDiscriminator, self).__init__()
-
-        self.ndf = ndf
-
-        self.main = nn.Sequential(
-            nn.Conv2d(1, ndf, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf * 2),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf * 4),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(ndf * 4, ndf*8, 3, 1, 0, bias=False),
-            nn.BatchNorm2d(ndf * 8),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Flatten(),
-            nn.Linear(ndf*8, 100),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Linear(100, 1),
-            nn.Sigmoid()
-        )
-
-    def forward(self, input):
-        return self.main(input)
     
 if __name__ == '__main__':
     latent_dim = 100
