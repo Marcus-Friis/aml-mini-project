@@ -47,17 +47,18 @@ if __name__ == '__main__':
     print('using device: ', device)
 
     # hyperparameters
-    batch_size = 128
+    batch_size = 64
     ## define model hyperparameters
-    latent_dim = 400
+    latent_dim = 100
     dropout = 0.2
     ## setup training hyperparameters
     lr = 1e-4
     n_epochs = 40
+    weight_decay = 1e-3
 
     # instantiate model
-    generator = DeepGenerator(latent_dim=latent_dim, dropout=dropout).to(device)
-    discriminator = ConvDiscriminator().to(device)
+    generator = SuperDeepGenerator(latent_dim=latent_dim, dropout=dropout, ngf=128).to(device) # DeepGenerator(latent_dim=latent_dim, dropout=dropout).to(device)
+    discriminator = SuperDeepConvDiscriminator().to(device)
     
     # setup mlflow tracking
     mlflow.set_tracking_uri('http://localhost:5000')
@@ -68,12 +69,12 @@ if __name__ == '__main__':
         ])
 
     # setup data
-    trainset = get_cats()
+    trainset = get_mnist()
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
     # valloader = torch.utils.data.DataLoader(valset, batch_size=batch_size, shuffle=True)
     
     # generate fixed noise for visualization of training progress
-    fixed_noise = torch.randn(64, latent_dim, device=device)
+    fixed_noise = torch.randn(64, latent_dim, 1, 1, device=device)  # torch.randn(64, latent_dim, device=device)
 
     # setup real and fake labels for loss function
     real_label = 1.
@@ -83,8 +84,8 @@ if __name__ == '__main__':
     loss_fn = nn.BCELoss()
 
     # setup optimizers
-    g_optim = torch.optim.Adam(generator.parameters(), lr=lr, weight_decay=1e-5)
-    d_optim = torch.optim.Adam(discriminator.parameters(), lr=lr, weight_decay=1e-5)
+    g_optim = torch.optim.Adam(generator.parameters(), lr=lr, weight_decay=weight_decay)
+    d_optim = torch.optim.Adam(discriminator.parameters(), lr=lr, weight_decay=weight_decay)
 
     # setup lists for tracking training progress
     img_list = []
@@ -109,7 +110,7 @@ if __name__ == '__main__':
                 
                 ## train the discriminator on fake data
                 # generate fake data
-                noise = torch.randn(b_size, latent_dim, device=device)
+                noise = torch.randn(b_size, latent_dim, 1, 1, device=device)  # torch.randn(b_size, latent_dim, device=device)
                 fake = generator(noise)
                 label = torch.full((b_size,), fake_label, dtype=torch.float, device=device)
                 
