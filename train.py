@@ -15,6 +15,9 @@ from src.models import *
 from IPython.display import HTML
 import matplotlib.animation as animation
 
+import warnings
+warnings.filterwarnings('ignore')
+
 
 def get_mnist():
     trainset = datasets.MNIST('data', download=True, train=True, transform=transform)
@@ -212,6 +215,9 @@ if __name__ == '__main__':
             mlflow.pytorch.log_model(discriminator, generator.__class__.__name__)
             
             # gif test
-            mlflow.log_artifact('kitty-cat-sandwich.gif')
-            fig, ani = training_animation(img_list, save=True)
-            mlflow.log_artifact('training.mp4')
+            try:
+                mlflow.log_artifact('kitty-cat-sandwich.gif')
+                fig, ani = training_animation(img_list, save=True)
+                mlflow.log_artifact('training.mp4')
+            except:
+                print('failed to log animation')
