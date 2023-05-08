@@ -29,10 +29,12 @@ We train the discriminator; we generate fake samples with the generator, and the
 The generator generates a new batch. The discriminator predicts, and we calculate the loss as a binary cross entropy, such that the generator is rewarded if it fools the discriminator. We calculate the loss of this process, backpropagate and take an optimizer step. 
 
 ## Results
-When a model is trained, it can generate drawings. The discriminator is usually better than the generator, as seen on the loss curve. 
-![Cat_drawings](figs/cats_generated_drawings.svg)
-![loss](figs/cats_gan_loss.svg)
+When a model is trained, it can generate drawings. The discriminator is usually better than the generator, as seen on the loss curve.
 
+<div style='display: flex;'>
+    <img src="figs/cats_generated_drawings.svg" width="350">
+    <img src="figs/cats_gan_loss.svg" width="350">
+</div>
 
 While these results are not perfect, they're a good start. Randomness seemed to help the model generalize better, and we observed deeper models performed better than shallower models. 
 
