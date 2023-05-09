@@ -35,6 +35,34 @@ def get_cats():
     trainset = TensorDataset(torch.tensor(x).float(), torch.tensor(y).float())
     return trainset
 
+
+def get_dogs():
+    img_dim = 28
+    dogs = np.load('data/dogs/full_numpy_bitmap_dog.npy').reshape(-1, 1, img_dim, img_dim) / 255
+    n_dogs = dogs.shape[0]
+
+    x = dogs  
+    y = np.ones(n_dogs)
+
+    trainset = TensorDataset(torch.tensor(x).float(), torch.tensor(y).float())
+    return trainset
+
+
+def get_catsanddogs():
+    img_dim = 28
+    cats = np.load('data/cats/full_numpy_bitmap_cat.npy').reshape(-1, 1, img_dim, img_dim) / 255
+    dogs = np.load('data/dogs/full_numpy_bitmap_dog.npy').reshape(-1, 1, img_dim, img_dim) / 255
+    
+    n_cats = cats.shape[0]
+    n_dogs = dogs.shape[0]
+    
+    x = np.concatenate((cats, dogs), axis=0)
+    y = np.concatenate((np.ones(n_cats), np.zeros(n_dogs)), axis=0)
+    
+    trainset = TensorDataset(torch.tensor(x).float(), torch.tensor(y).float())
+    return trainset
+    
+
 if __name__ == '__main__':
     # run parameters
     verbose = True
@@ -51,13 +79,14 @@ if __name__ == '__main__':
     latent_dim = 100
     dropout = 0.2
     ## setup training hyperparameters
-    lr = 0.0002
+    lr = 0.0005
     n_epochs = 40
-    weight_decay = 1e-3
+    weight_decay = 1e-4
 
     # instantiate model
-    generator = SuperDeepGenerator(latent_dim=latent_dim, dropout=dropout, ngf=128).to(device) # DeepGenerator(latent_dim=latent_dim, dropout=dropout).to(device)
-    discriminator = SuperDeepConvDiscriminator().to(device)
+    ngf = 128
+    generator = SuperDeepGenerator(latent_dim=latent_dim, dropout=dropout, ngf=ngf).to(device)
+    discriminator = SuperDeepConvDiscriminator(16).to(device)
     
     # setup mlflow tracking
     mlflow.set_tracking_uri('http://localhost:5000')
@@ -167,7 +196,7 @@ if __name__ == '__main__':
     print('logging to mlflow...')
     if mlflow_log:
         
-        run_description = f'trained on MNIST for {n_epochs} epochs with batch size {batch_size}, models:\n{generator.__repr__()} \n{discriminator.__repr__()}'
+        run_description = f'trained for {n_epochs} epochs with batch size {batch_size}, models:\n{generator.__repr__()} \n{discriminator.__repr__()}'
         
         # save run and model to mlflow
         with mlflow.start_run(description=run_description):
