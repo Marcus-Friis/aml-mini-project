@@ -2,6 +2,10 @@ import torch
 import torch.nn as nn
 
 class SuperDeepGenerator(nn.Module):
+    """
+    Deep Convolutional Generative Adversarial Network (DCGAN) generator,
+    Generates images from a random noise vector (latent_dim, 1, 1).
+    """
     def __init__(self,
                 latent_dim: int = 100,
                 dropout: float = 0.2,
@@ -14,20 +18,25 @@ class SuperDeepGenerator(nn.Module):
         self.ngf = ngf
 
         self.main = nn.Sequential(
+            # latent_dim, 1, 1
             nn.ConvTranspose2d(latent_dim, ngf * 4, 4, 1, 0, bias=False),
             nn.BatchNorm2d(ngf * 4),
             nn.ReLU(True),
             nn.Dropout(dropout),
+            # ngf * 4, 4, 4
             nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf * 2),
             nn.ReLU(True),
             nn.Dropout(dropout),
+            # ngf * 2, 8, 8
             nn.ConvTranspose2d( ngf * 2, ngf, 4, 2, 2, bias=False),
             nn.BatchNorm2d(ngf),
             nn.ReLU(True),
             nn.Dropout(dropout),
+            # ngf, 14, 14
             nn.ConvTranspose2d(ngf, 1, 4, 2, 1, bias=False),
             nn.Sigmoid()
+            # 1, 28, 28
         )
 
     def forward(self, input):
@@ -35,6 +44,10 @@ class SuperDeepGenerator(nn.Module):
 
 
 class SuperDeepConvDiscriminator(nn.Module):
+    """
+    Deep Convolutional Generative Adversarial Network (DCGAN) discriminator,
+    Discriminates between real and generated images.
+    """
     def __init__(self,
                  ndf: int = 64):
         super(SuperDeepConvDiscriminator, self).__init__()
