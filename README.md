@@ -12,7 +12,7 @@ This project generates fake drawings using Generative Adversarial Networks (GAN)
 This project uses the [Google Quickdraw](https://quickdraw.withgoogle.com/data) dataset. It consists of 50 million 28x28 greyscale images across 345 different classes. Google has preprocessed the data by centering and scaling the drawings appropriately. Due to the complexity of the problem, we currently use and generate cats, dogs, apples, and stop-signs. We experimented with both cats and dogs. 
 
 ## Methodology
-Throughout the process, we trained many models with multiple architecture types. The architectures used for the final and best performing generator and discriminator are *[SuperDeepGenerator](src/models.py)* and *[SuperDeepConvDiscriminator](src/models.py)* respectively. 
+Throughout the process, we trained many models with multiple architecture types. We incrementally experimented with model depth, learning rate, dropout and batch size, changing one aspect at a time and investigating the result, leading us the current setup. The architectures used for the final and best performing generator and discriminator are *[SuperDeepGenerator](src/models.py)* and *[SuperDeepConvDiscriminator](src/models.py)* respectively. 
 
 ### Generator - *[SuperDeepGenerator](src/models.py)*
 The generator is a convolutional model, that generates a 28x28 synthetic drawing from a latent vector. It contains 4 transposed convolutional layers, each halving the amount of channels. Between layers, we apply batch normalization and activate the layer with ReLU. For added randomness, and to combat mode collapse, we use dropout on all layers except the last. For the last layer, we convolve to 1 channel, and activate it with sigmoid to scale values between 0 and 1. 
