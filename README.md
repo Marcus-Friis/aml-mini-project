@@ -51,7 +51,7 @@ To replicate our results, run
 python train.py
 ```
 This script can be modified to change hyperparameters, models, data etc. 
-We use ml-flow for tracking experiment results. As such, an ml-flow server must be hosted for the script to execute correctly. We hosted it on a local host with the command 
+We use ml-flow for tracking experiment results. As such, a ml-flow tracking server must be hosted for the script to execute correctly. We hosted it on a local host with the command 
 
 ```
 mlflow ui
