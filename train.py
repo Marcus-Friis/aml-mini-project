@@ -19,6 +19,10 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
+##############################
+# Functions for getting data #
+##############################
+
 def get_mnist():
     trainset = datasets.MNIST('data', download=True, train=True, transform=transform)
     return trainset  #, valset
@@ -101,13 +105,13 @@ if __name__ == '__main__':
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
     
     # generate fixed noise for visualization of training progress
-    fixed_noise = torch.randn(64, latent_dim, 1, 1, device=device)  # torch.randn(64, latent_dim, device=device)
+    fixed_noise = torch.randn(64, latent_dim, 1, 1, device=device)
 
     # setup real and fake labels for loss function
     real_label = 1.
     fake_label = 0.
 
-    # setup loss function
+    # setup loss function for binary classification
     loss_fn = nn.BCELoss()
 
     # setup optimizers
@@ -122,6 +126,7 @@ if __name__ == '__main__':
     D_batch_losses = []
     iters = 0
     
+    # begin training
     try:
         for epoch in range(1, n_epochs + 1):
             for i, (real, _) in enumerate(trainloader):
