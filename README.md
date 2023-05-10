@@ -36,6 +36,8 @@ When a model is trained, it can generate drawings. The discriminator is usually 
     <img src="figs/cats_gan_loss.svg" width="350">
 </div>
 
+We experimented with generating dogs and stop signs as well. The resulting figures can be found in [figs](figs)
+
 While these results are not perfect, they're a good start. Randomness seemed to help the model generalize better, and we observed deeper models performed better than shallower models. 
 
 
