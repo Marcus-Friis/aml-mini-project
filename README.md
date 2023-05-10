@@ -3,8 +3,11 @@
 ### Members: 
 Mads Høgenhaug (mkrh@itu.dk), Marcus Friis (mahf@itu.dk), Morten Pedersen (mohp@itu.dk)
 
-<img src="figs/cats_train_example.gif" width="400">
 
+<div style="display: flex;">
+    <img src="figs/20230509-cats/training.gif" width="350">
+    <img src="figs/apples/training.gif" width="350">
+</div>
 
 This project generates fake drawings using Generative Adversarial Networks (GAN), using the [Google Quickdraw](https://quickdraw.withgoogle.com/data) dataset. 
 
