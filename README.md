@@ -1,6 +1,7 @@
-# Generating synthetic drawings with Google QuickDraw	
+# Generating synthetic drawings with Google QuickDraw
+### Mini-Project in Advanced Machine Learning (Spring 2023) IT-University of Copenhagen
 ### Members: 
-Mads Høgenhaug, Marcus Friis, Morten Pedersen
+Mads Høgenhaug (mkrh@itu.dk), Marcus Friis (mahf@itu.dk), Morten Pedersen (mohp@itu.dk)
 
 <img src="figs/cats_train_example.gif" width="400">
 
@@ -8,7 +9,7 @@ Mads Høgenhaug, Marcus Friis, Morten Pedersen
 This project generates fake drawings using Generative Adversarial Networks (GAN), using the [Google Quickdraw](https://quickdraw.withgoogle.com/data) dataset. 
 
 ## The dataset
-This project uses the [Google Quickdraw](https://quickdraw.withgoogle.com/data) dataset. It consists of 50 million 28x28 greyscale images across 345 different classes. Google has preprocessed the data by centering and scaling the drawings appropriately. Due to the complexity of the problem, we currently only use and generate cats. However, for future development, we would like to include more classes. 
+This project uses the [Google Quickdraw](https://quickdraw.withgoogle.com/data) dataset. It consists of 50 million 28x28 greyscale images across 345 different classes. Google has preprocessed the data by centering and scaling the drawings appropriately. Due to the complexity of the problem, we currently use and generate cats, dogs, apples, and stop-signs. We experimented with both cats and dogs. 
 
 ## Methodology
 Throughout the process, we trained many models with multiple architecture types. The architectures used for the final and best performing generator and discriminator are *[SuperDeepGenerator](src/models.py)* and *[SuperDeepConvDiscriminator](src/models.py)* respectively. 
