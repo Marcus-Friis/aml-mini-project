@@ -253,7 +253,6 @@ if __name__ == '__main__':
             
             # gif test
             try:
-                mlflow.log_artifact('kitty-cat-sandwich.gif')
                 fig, ani = training_animation(img_list, save=True)
                 mlflow.log_artifact('training.gif')
             except:
